@@ -1,8 +1,15 @@
 const apiClient = require('../utils/apiClient');
 
-const getAircraftTypes = async () => {
+const getAircraftTypes = async (iataSub) => {
     try {
-        const response = await apiClient.get('/aircraftTypes');
+        const response = await apiClient.get('/aircrafttypes', {
+            params: {
+                
+                iataSub: iataSub,
+                
+            },
+           
+        });
         return response.data;
     } catch (error) {
         throw new Error(`Error fetching aircraft types: ${error.message}`);

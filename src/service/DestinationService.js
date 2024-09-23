@@ -9,6 +9,18 @@ const getDestinations = async () => {
     }
 };
 
+const getDestinationByCode = async (destinationCode) => {
+    try {
+        const response = await apiClient.get(`/destinations/${destinationCode}`);
+        return response.data;
+    } catch (error) {
+        throw new Error(`Error fetching destination: ${error.message}`);
+    }
+};
+
+
+
 module.exports = {
-    getDestinations
+    getDestinations,
+    getDestinationByCode
 };

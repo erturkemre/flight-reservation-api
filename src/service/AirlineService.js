@@ -10,6 +10,16 @@ const getAirlines = async () => {
     }
 };
 
+const getAirlineByCode = async (airlinecode) => {
+   try {
+       const response = await apiClient.get(`/airlines/${airlinecode}`);
+       return response.data;
+   } catch (error) {
+       throw new Error(`Error fetching airlines: ${error.message}`);
+   }
+};
+
 module.exports = {
-    getAirlines
+    getAirlines,
+    getAirlineByCode
 };
