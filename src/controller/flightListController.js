@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const FlightListService = require('../service/FlightListService');
 const Flight = require('../model/Flight');
-const { default: axios } = require('axios');
+const FlightListService = require('../service/flightListService');
+
 
 router.get('/', async (req, res) => {
     try {

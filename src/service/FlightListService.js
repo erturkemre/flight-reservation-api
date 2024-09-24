@@ -11,9 +11,20 @@ const getFlights = async (query = {}) => {
                 includedelays: 'false',
                 page: query.page || 0,
                 sort: query.sort || '+scheduleTime',
-                ...query
-            }
-        });
+                scheduleDate: query.scheduleDate || new Date().toISOString().split('T')[0],
+                scheduleTime: query.scheduleTime,
+                flightName: query.flightName,
+                flightDirection: query.flightDirection,
+                airline: query.airline,
+                airlineCode: query.airlineCode,
+                route: query.route,
+                fromDateTime: query.fromDateTime,
+                toDateTime: query.toDateTime,
+                searchDateTimeField: query.searchDateTimeField,
+                fromScheduleDate: query.fromScheduleDate,
+                toScheduleDate: query.toScheduleDate,
+                isOperationalFlight: query.isOperationalFlight
+        }});
 
         return response.data.flights || []; 
     } catch (error) {
@@ -24,17 +35,35 @@ const getFlights = async (query = {}) => {
 const getEnrichedFlights = async (query = {}) => {
     try {
         const flightsData = await getFlights(query);
-        
-        const enrichedFlights = await Promise.all(flightsData.map(async flight => {
-            const airline = await AirlineService.getAirlineByCode(flight.prefixIATA);
-            const destination = await DestinationService.getDestinationByCode(flight.route.destinations[0]);
-            const aircraftType = await AircraftTypeService.getAircraftTypes(flight.aircraftType.iataSub);
+        const enrichedFlights = await Promise.all(flightsData.map(async (flight) => {
+            let airline, destination, aircraftType;
+
+            
+            try {
+                airline = await AirlineService.getAirlineByCode(flight.prefixIATA);
+            } catch (error) {
+                console.error(`Error fetching airline for code ${flight.prefixIATA}: ${error.message}`);
+            }
+
+            
+            try {
+                destination = await DestinationService.getDestinationByCode(flight.route.destinations[0]);
+            } catch (error) {
+                console.error(`Error fetching destination for code ${flight.route.destinations[0]}: ${error.message}`);
+            }
+
+            
+            try {
+                aircraftType = await AircraftTypeService.getAircraftTypes(flight.aircraftType.iataSub);
+            } catch (error) {
+                console.error(`Error fetching aircraft type for code ${flight.aircraftType.iataSub}: ${error.message}`);
+            }
 
             return {
                 ...flight,
                 airlineName: airline ? airline : "Unknown Airline",
                 destinationName: destination ? destination : "Unknown Destination",
-                aircraftDescription: aircraftType ? aircraftType.longDescription : "Unknown Aircraft",
+                aircraftDescription: aircraftType ? aircraftType : "Unknown Aircraft",
             };
         }));
 
@@ -43,6 +72,7 @@ const getEnrichedFlights = async (query = {}) => {
         throw new Error(`Error fetching and enriching flights: ${error.message}`);
     }
 };
+
 
 
 const getFlightDetails = async (flightId) => {

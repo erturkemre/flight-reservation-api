@@ -1,11 +1,12 @@
-const Reservation = require('../model/reservationModel');
+const Reservation = require('../model/Reservation');
 
-const createReservation = async ({ flightId, userId, seats }) => {
+const createReservation = async ({ flight, userId }) => {
     try {
+        console.log('Received flight:', flight);
+        console.log('Received userId:', userId);
         const newReservation = new Reservation({
-            flightId,
+            flight,
             userId,
-            seats,
             reservedAt: new Date()
         });
         return await newReservation.save();
